@@ -1,0 +1,13 @@
+This is a script for creating screencasts on Linux.
+
+# Version 1.02
+# Modifications by brousch (Ben Rousch, brousch@gmail.com):
+#     Added -a option to allow different aspect ratios (4:3 default)
+#
+# Version 1.01
+# Modifications by brousch (Ben Rousch, brousch@gmail.com):
+#     Upped it to 30 FPS capture
+#     Added OpenShot-preferred codecs output section (mp4/mpeg4/faac)
+#
+# Version 1.0
+# Original script is from http://okiebuntu.homelinux.com/blog/?p=175

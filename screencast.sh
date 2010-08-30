@@ -1,9 +1,16 @@
 #!/bin/bash
 
-# Original script is from http://okiebuntu.homelinux.com/blog/?p=175
+# Version 1.02
+# Modifications by brousch (Ben Rousch, brousch@gmail.com):
+#     Added -a option to allow different aspect ratios (4:3 default)
+#
+# Version 1.01
 # Modifications by brousch (Ben Rousch, brousch@gmail.com):
 #     Upped it to 30 FPS capture
 #     Added OpenShot-preferred codecs output section (mp4/mpeg4/faac)
+#
+# Version 1.0
+# Original script is from http://okiebuntu.homelinux.com/blog/?p=175
 
 # list of programs we depend on
 progs="xdpyinfo grep head sed ffmpeg pacat parec sox"
@@ -26,6 +33,7 @@ screenSize="640x480" # default if we cant detect it
 screenOffset="0,0" # default to top-left corner
 frameRate="30" # default frame rate
 baseName="capture" # default base filename for capture
+aspectRatio="4:3" # default aspect ratio (16:9 is other common ratio)
 
 # attempt to detect the dimension of the screen for the default
 dimensions=`xdpyinfo | grep 'dimensions:' | head -1 | \
@@ -35,7 +43,7 @@ if [[ "$dimensions" =~ [0-9]+x[0-9]+ ]]; then
 fi
 
 # collect command line settings
-while getopts 'hs:o:t:p' param ; do
+while getopts 'hs:o:t:a:p' param ; do
   case $param in
     s)
       screenSize="$OPTARG"
@@ -45,6 +53,9 @@ while getopts 'hs:o:t:p' param ; do
       ;;
     t)
       timeToRecord="$OPTARG"
+      ;;
+    a)
+      aspectRatio="$OPTARG"
       ;;
     *)
       echo ""
@@ -57,6 +68,7 @@ while getopts 'hs:o:t:p' param ; do
       echo "	-s <size>     screensize to record as <width>x<height>"
       echo "	-o <offset>   offset off recording area as <xoffset>,<yoffset>"
       echo "	-t <time>     time to record (in seconds)"
+      echo "    -a <aspect>   aspect ratio to use (4:3 default, 16:9 also common"
       echo ""
       exit 0
       ;;
@@ -73,6 +85,7 @@ fi
 echo ""
 echo "Size = $screenSize"
 echo "Offset = $screenOffset"
+echo "Aspect Ratio = $aspectRatio"
 echo "Rate = $frameRate"
 echo "Filename = $baseName"
 
@@ -94,8 +107,8 @@ pidSilence=$!
 # starts recording video using x11grab to make mpeg2video
 ffmpeg -y -an \
   -s "$screenSize" -r "$frameRate" -f x11grab -i :0.0+"$screenOffset" \
-  -s "$screenSize" -r "$frameRate" -aspect 4:3 -vcodec mpeg2video -sameq \
-  -f mpeg2video "$baseName.mpeg" &
+  -s "$screenSize" -r "$frameRate" -aspect "$aspectRatio" -vcodec mpeg2video \
+  -sameq -f mpeg2video "$baseName.mpeg" &
 pidVideo=$!
 
 # starts recording raw audio
